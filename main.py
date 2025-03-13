@@ -2,6 +2,7 @@ from container.imports_library import *
 # hand made
 from business_name_gen import BusinessName
 from planet_store import PlanetStore
+from rocket_store import RocketStore
 # window
 screenWidth, screenHeight = 1280, 720
 current_time = time.time()
@@ -51,13 +52,17 @@ class TopPanel:
         self.time_played.set_text(f"Play Time: {int(hours):02d}:{int(minutes):02d}:{int(seconds):02d}.{int(milliseconds):03d}")
         self.planet_name.set_text(f"Planet: {self.planetName}")
 
-    def handle_event(self, event, planet_panel):
+    def handle_event(self, event, planet_panel, rocket_panel):
         if self.randomizeName.process_event(event):
             self.textBusiness_Name.set_text(BusinessName())
         
         if self.planetStore.process_event(event):
             planet_panel.store_open = not planet_panel.store_open
             planet_panel.toggle_store()
+        
+        if self.rocketStore.process_event(event):
+            rocket_panel.store_open = not rocket_panel.store_open
+            rocket_panel.toggle_store()
 
 # details
 class DetailsPanel:
@@ -106,6 +111,7 @@ class App:
         self.running = True
         # panels
         self.planet_panel = PlanetStore(self.ui_manager, (screenWidth, screenHeight))
+        self.rocket_panel = RocketStore(self.ui_manager, (screenWidth, screenHeight))
         # -->
         self.top_panel = TopPanel(self.ui_manager)
         self.details_panel = DetailsPanel(self.ui_manager)
@@ -120,9 +126,12 @@ class App:
                     self.running = False
                     sys.exit()
                 self.ui_manager.process_events(event)
-                self.top_panel.handle_event(event, self.planet_panel)
+                self.top_panel.handle_event(event, self.planet_panel, self.rocket_panel)
                 if self.planet_panel.store_open:
                     self.planet_panel.handle_event(event)
+
+                if self.rocket_panel.store_open:
+                    self.rocket_panel.handle_event(event)
             # Draw elements
             self.ui_manager.update(time_delta)
             self.screen.blit(self.background_surface, (0, 0))
