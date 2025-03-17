@@ -1,15 +1,7 @@
 from container.imports_library import *
-from planet_name_gen import GenerateName
-from business_name_gen import BusinessName
-
-# format number
-def format_number(num):
-    """Formats large numbers with suffixes"""
-    if num >= 1e6:
-        suffixes = ['Mil', 'Bil', 'Tri', 'Qua', 'Qui', 'Sex', 'Sep']
-        index = int(math.log10(num) // 3 - 2)
-        return f"{num / 10**(6 + index * 3):.2f} {suffixes[index]}" if index < len(suffixes) else f"{num:.2e}"
-    return f"{num:,.2f}"
+from generators.elements import *
+from generators.planet_name_gen import *
+from generators.business_name_gen import *
 
 # Planet Content
 class PlanetContent:
@@ -19,17 +11,11 @@ class PlanetContent:
         self.screenWidth, self.screenHeight = screenSize
         self.name = f"Planet Name: {GenerateName()}"
         self.companyName = f"Business Name: {BusinessName()}"
-        self.cost = self._weighted_random(1000, sys.maxsize, 50)
-        self.distance = self._weighted_random(10, sys.maxsize, 10)
-        self.upKeep = self._weighted_random(0.01, sys.maxsize, 20)
+        self.cost = Large_Number_Random_Generator(10**18, sys.maxsize)
+        self.distance = Large_Number_Random_Generator(24, sys.maxsize)
+        self.upKeep = Weighted_Random(0.01, sys.maxsize, 20)
         self.availablePurchase = "Available"
-        self.currencyConversion = self._weighted_random(-9.00, 9.00, 1)
-
-    def _weighted_random(self, min_val, max_val, weight=3):
-        # Using base as random value raised to a power creates a weighted distribution
-        base = random.random() ** weight
-        weighted_value = min_val + (max_val - min_val) * base
-        return max(min_val, min(weighted_value, max_val))
+        self.currencyConversion = Weighted_Random(-9.00, 9.00, 1)
     
     def build(self, i):
         panel_width = self.screenWidth - 20
@@ -39,15 +25,15 @@ class PlanetContent:
         self.btn = UIButton(relative_rect=pygame.Rect((0, 0), (100, panel_height-7)), text=f"{self.availablePurchase}", manager=self.ui_manager, container=self.planetContainer)
         self.name_label = UILabel(relative_rect=pygame.Rect((100, 5), (300, 20)), text=self.name, manager=self.ui_manager, container=self.planetContainer)
         self.companyName_label = UILabel(relative_rect=pygame.Rect((100, 20), (300, 20)), text=self.companyName, manager=self.ui_manager, container=self.planetContainer)
-        cost_txt = f"Cost: ${format_number(self.cost)}"
+        cost_txt = f"Cost: ${Format_Number(self.cost)}"
         self.cost_label = UILabel(relative_rect=pygame.Rect((100, 40), (300, 20)), text=cost_txt, manager=self.ui_manager, container=self.planetContainer)
         # price
         self.planetContainer_2 = UIPanel(relative_rect=pygame.Rect((self.screenWidth - 325, -1), (300, panel_height)), manager=self.ui_manager, container=self.planetContainer)
-        distance_txt = f"Distance: ${format_number(self.distance)}"
+        distance_txt = f"Distance: ${Format_Number(self.distance)}"
         self.distance_label = UILabel(relative_rect=pygame.Rect((1, 1), (300, 20)), text=distance_txt, manager=self.ui_manager, container=self.planetContainer_2)
-        upKeep_txt = f"Up Keep: ${format_number(self.upKeep)}"
+        upKeep_txt = f"Up Keep: ${Format_Number(self.upKeep)}"
         self.upKeep_label = UILabel(relative_rect=pygame.Rect((1, 20), (300, 20)), text=upKeep_txt, manager=self.ui_manager, container=self.planetContainer_2)
-        currencyConversion_txt = f"Currency Conversion: ${format_number(self.currencyConversion)} -> 1 USD"
+        currencyConversion_txt = f"Currency Conversion: ${Format_Number(self.currencyConversion)} -> 1 USD"
         self.currencyConversion_label = UILabel(relative_rect=pygame.Rect((1, 40), (300, 20)), text=currencyConversion_txt, manager=self.ui_manager, container=self.planetContainer_2)
 
 # Planet Store
